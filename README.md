@@ -7,6 +7,7 @@ This project uses nodejs, express, mongodb, mongoose.
 * Assigns 3 character unique pin for all users. 
 * It user jwt auth and bcrypt to hash password.
 * User cannot use last 3 recent passwords.
+* Sends welcome email with nodemailer on user create.
 * FAQ management apis :
   * CRUD for FAQ (question,answer,category), with soft delete.
   * Create FAQ category and get FAQ categories
