@@ -1,5 +1,5 @@
 const User = require("../model/users");
-const { randomThreeDigits, generateHash, compareHash, generateToken } = require("../util/util");
+const { randomThreeDigits, generateHash, compareHash, generateToken, sendEmail } = require("../util/util");
 
 const createUser = async (createUserDto) => {
   try {
@@ -12,16 +12,22 @@ const createUser = async (createUserDto) => {
     };
 
     const userDetails = await new User(newUser).save();
-    
-    const token = generateToken({id: userDetails?._id});
+
+    const token = generateToken({ id: userDetails?._id });
+
+    // send email after user is created successfully
+    sendEmail(createUserDto.email, {
+      subject: "Welcome",
+      text: "Welcome to the app.",
+    });
+
     return {
       success: true,
       data: {
         accessToken: token,
-        message: 'Created Successfully.'
+        message: "Created Successfully.",
       },
     };
-    // send email after user is created successfully
   } catch (err) {
     return {
       success: false,
@@ -32,9 +38,12 @@ const createUser = async (createUserDto) => {
 
 const userLogin = async (loginDto) => {
   try {
-    const userDetails = await User.findOne({
-      email: loginDto.email,
-    },'_id password');
+    const userDetails = await User.findOne(
+      {
+        email: loginDto.email,
+      },
+      "_id password"
+    );
 
     if (!userDetails) {
       return {
@@ -71,9 +80,12 @@ const changePassword = async (user, changePasswordDto) => {
   try {
     const { currentPassword, newPassword } = changePasswordDto;
 
-    const userDetails = await User.findOne({
-      _id: user.id,
-    },'_id password recentPasswords');
+    const userDetails = await User.findOne(
+      {
+        _id: user.id,
+      },
+      "_id password recentPasswords"
+    );
 
     if (!userDetails) {
       return {
@@ -130,7 +142,6 @@ const changePassword = async (user, changePasswordDto) => {
   }
 };
 
-
 const getUser = async (user) => {
   try {
     if (!user) {
@@ -138,7 +149,7 @@ const getUser = async (user) => {
     }
     return {
       success: true,
-      data: await User.findById(user.id,'_id name pin email'),
+      data: await User.findById(user.id, "_id name pin email"),
     };
   } catch (err) {
     return {
